@@ -4,18 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Ageless Call, Interactive Playbook</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#EFF1EC;--surface:#FFFFFF;--ink:#191B18;--muted:#6F736B;--faint:#9A9D94;
-    --line:#DBDDD4;--green:#1F4A3D;--green-soft:#E7EEE9;--brass:#8A6A22;--brass-soft:#F4ECD8;
+    --paper:#EFF1EC;--surface:#FFFFFF;--ink:#191B18;--muted:#53574E;--faint:#7C8077;
+    --line:#D6D8CF;--green:#1F4A3D;--green-soft:#E3ECE6;--brass:#856420;--brass-soft:#F4ECD8;
     --ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
     --display:'Fraunces',Georgia,serif;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;padding:34px 20px 60px}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;padding:34px 20px 60px}
   .wrap{max-width:980px;margin:0 auto}
 
   header{text-align:center;margin-bottom:8px}
@@ -28,13 +30,16 @@
   .btn:hover{border-color:var(--green)}
   .hint{text-align:center;font-size:12px;color:var(--faint);margin:8px 0 24px}
 
-  .map{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:30px}
-  .node{flex:1;padding:13px 10px;text-align:center;border-right:1px solid var(--line)}
+  .map{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:30px;position:sticky;top:0;z-index:50;box-shadow:0 3px 14px rgba(25,27,24,.07)}
+  .node{flex:1;padding:11px 10px 9px;text-align:center;border-right:1px solid var(--line);text-decoration:none;color:inherit;cursor:pointer;transition:background .14s ease;box-shadow:inset 0 0 0 var(--green)}
+  .node:hover{background:var(--green-soft)}
+  .node.active{background:var(--green-soft);box-shadow:inset 0 -3px 0 var(--green)}
+  .node.active .n,.node.active .t{color:var(--green)}
   .node:last-child{border-right:none}
   .node .n{font-family:var(--display);font-size:17px;font-weight:600;color:var(--green)}
   .node .t{font-size:11.5px;color:var(--ink);font-weight:600;margin-top:2px;line-height:1.2}
 
-  .stage{display:grid;grid-template-columns:60px 1fr;gap:18px}
+  .stage{display:grid;grid-template-columns:60px 1fr;gap:18px;scroll-margin-top:68px}
   .rail{display:flex;flex-direction:column;align-items:center}
   .dot{width:44px;height:44px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-family:var(--display);font-size:20px;font-weight:600;flex:0 0 auto}
   .ln{flex:1;width:2px;background:var(--line);margin:6px 0}
@@ -47,15 +52,15 @@
 
   .tiles{display:flex;flex-direction:column;gap:7px}
   details.tile{border:1px solid var(--line);border-radius:9px;background:#FBFCFA;overflow:hidden}
-  details.tile summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:9px;padding:11px 13px;font-size:13.5px;font-weight:600}
+  details.tile summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:9px;padding:12px 14px;font-size:14.5px;font-weight:600}
   details.tile summary::-webkit-details-marker{display:none}
   .chev{flex:0 0 auto;width:13px;height:13px;color:var(--faint);transition:transform .18s ease}
   details[open] .chev{transform:rotate(90deg)}
   .tl{flex:1}
   .code{font-size:10.5px;font-weight:700;letter-spacing:.02em;color:var(--green);background:var(--green-soft);border-radius:4px;padding:2px 6px;line-height:1;flex:0 0 auto}
   .tt{padding:2px 14px 14px 36px;border-top:1px solid var(--line);background:var(--surface)}
-  .tt .say{position:relative;margin:11px 0 0;color:var(--ink);padding-left:14px;border-left:2px solid var(--brass)}
-  .tt .do{margin:11px 0 0;font-size:12.5px;color:var(--muted)}
+  .tt .say{position:relative;margin:10px 0 0;color:var(--ink);font-size:16px;font-weight:500;line-height:1.5;padding:8px 13px;border-left:3px solid var(--brass);background:#FBF6E9;border-radius:0 7px 7px 0}
+  .tt .do{margin:10px 0 0;font-size:13.5px;color:var(--muted)}
   .tt .do b{color:var(--brass);font-weight:600}
   .slide{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:.02em;color:var(--muted);background:#EEF0EA;border:1px solid var(--line);border-radius:5px;padding:3px 7px 3px 6px;line-height:1;flex:0 0 auto}
   .slide svg{width:13px;height:9px}
@@ -106,15 +111,16 @@
   </header>
 
   <div class="map">
-    <div class="node"><div class="n">1</div><div class="t">Discovery</div></div>
-    <div class="node"><div class="n">2</div><div class="t">Status quo + proof</div></div>
-    <div class="node"><div class="n">3</div><div class="t">The demo</div></div>
-    <div class="node"><div class="n">4</div><div class="t">Back end + price</div></div>
-    <div class="node"><div class="n">5</div><div class="t">The close</div></div>
+    <a class="node" href="#stage-0"><div class="n">0</div><div class="t">Before</div></a>
+    <a class="node" href="#stage-1"><div class="n">1</div><div class="t">Discovery</div></a>
+    <a class="node" href="#stage-2"><div class="n">2</div><div class="t">Status quo + proof</div></a>
+    <a class="node" href="#stage-3"><div class="n">3</div><div class="t">The demo</div></a>
+    <a class="node" href="#stage-4"><div class="n">4</div><div class="t">Back end + price</div></a>
+    <a class="node" href="#stage-5"><div class="n">5</div><div class="t">The close</div></a>
   </div>
 
   <!-- BEFORE THE CALL -->
-  <div class="stage">
+  <div class="stage" id="stage-0">
     <div class="rail"><div class="dot">0</div><div class="ln"></div></div>
     <div class="card">
       <h2>Before the call</h2>
@@ -131,7 +137,7 @@
   </div>
 
   <!-- STAGE 1 -->
-  <div class="stage">
+  <div class="stage" id="stage-1">
     <div class="rail"><div class="dot">1</div><div class="ln"></div></div>
     <div class="card">
       <h2>Discovery</h2>
@@ -162,7 +168,7 @@
   </div>
 
   <!-- STAGE 2 -->
-  <div class="stage">
+  <div class="stage" id="stage-2">
     <div class="rail"><div class="dot">2</div><div class="ln"></div></div>
     <div class="card">
       <h2>Status quo + industry proof</h2>
@@ -188,7 +194,7 @@
   </div>
 
   <!-- STAGE 3 -->
-  <div class="stage">
+  <div class="stage" id="stage-3">
     <div class="rail"><div class="dot">3</div><div class="ln"></div></div>
     <div class="card">
       <h2>The demo</h2>
@@ -215,7 +221,7 @@
   </div>
 
   <!-- STAGE 4 -->
-  <div class="stage">
+  <div class="stage" id="stage-4">
     <div class="rail"><div class="dot">4</div><div class="ln"></div></div>
     <div class="card">
       <h2>Back end, pricing, promo</h2>
@@ -243,7 +249,7 @@
   </div>
 
   <!-- STAGE 5 -->
-  <div class="stage">
+  <div class="stage" id="stage-5">
     <div class="rail"><div class="dot">5</div></div>
     <div class="card">
       <h2>The close</h2>
@@ -274,6 +280,10 @@
   var tiles = Array.prototype.slice.call(document.querySelectorAll('details.tile'));
   document.getElementById('expandAll').addEventListener('click', function(){tiles.forEach(function(t){t.open=true})});
   document.getElementById('collapseAll').addEventListener('click', function(){tiles.forEach(function(t){t.open=false})});
+  var navMap={};
+  Array.prototype.slice.call(document.querySelectorAll('.map .node')).forEach(function(n){navMap[n.getAttribute('href').slice(1)]=n;});
+  var spy=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){for(var k in navMap){navMap[k].classList.remove('active');} if(navMap[e.target.id]) navMap[e.target.id].classList.add('active');}});},{rootMargin:'-62px 0px -72% 0px',threshold:0});
+  Array.prototype.slice.call(document.querySelectorAll('.stage')).forEach(function(st){spy.observe(st);});
 </script>
 </body>
 </html>
